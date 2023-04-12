@@ -6,8 +6,7 @@ uses
   influxDB2 in '..\Source\influxDB2.pas',
   InfluxDB.Types in '..\Source\InfluxDB.Types.pas',
   InfluxDB.Interfaces in '..\Source\InfluxDB.Interfaces.pas',
-  influxDB.Core in '..\Source\influxDB.Core.pas',
-  influxDB.Request in '..\Source\influxDB.Request.pas';
+  influxDB.Core in '..\Source\influxDB.Core.pas';
 
 {$R *.res}
 
