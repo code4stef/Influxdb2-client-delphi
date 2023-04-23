@@ -20,21 +20,21 @@ object Form1: TForm1
     Height = 13
     Caption = 'URL'
   end
-  object Label2: TLabel
+  object s: TLabel
     Left = 22
     Top = 43
     Width = 29
     Height = 13
     Caption = 'Token'
   end
-  object Button1: TButton
+  object btnClientFunctions: TButton
     Left = 22
     Top = 80
     Width = 147
     Height = 25
     Caption = 'Client functions'
     TabOrder = 0
-    OnClick = Button1Click
+    OnClick = btnClientFunctionsClick
   end
   object edtServerURL: TEdit
     Left = 57
@@ -63,12 +63,13 @@ object Form1: TForm1
       'Memo1')
     TabOrder = 3
   end
-  object Button2: TButton
-    Left = 256
-    Top = 80
-    Width = 75
+  object btnWriteExample: TButton
+    Left = 22
+    Top = 111
+    Width = 147
     Height = 25
-    Caption = 'Button2'
+    Caption = 'Write Exemple'
     TabOrder = 4
+    OnClick = btnWriteExampleClick
   end
 end

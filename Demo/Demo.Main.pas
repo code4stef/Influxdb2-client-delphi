@@ -8,14 +8,15 @@ uses
 
 type
   TForm1 = class(TForm)
-    Button1: TButton;
+    btnClientFunctions: TButton;
     edtServerURL: TEdit;
     Label1: TLabel;
-    Label2: TLabel;
+    s: TLabel;
     edtToken: TEdit;
     Memo1: TMemo;
-    Button2: TButton;
-    procedure Button1Click(Sender: TObject);
+    btnWriteExample: TButton;
+    procedure btnClientFunctionsClick(Sender: TObject);
+    procedure btnWriteExampleClick(Sender: TObject);
   private
     { Private declarations }
   public
@@ -28,11 +29,15 @@ var
 implementation
 uses  influxDB2,
       InfluxDB.Interfaces,
-      InfluxDB.Types;
+      InfluxDB.Types ,
+      system.DateUtils,
+      System.Diagnostics,
+      system.Generics.Collections,
+      system.Rtti;
 
 {$R *.dfm}
 
-procedure TForm1.Button1Click(Sender: TObject);
+procedure TForm1.btnClientFunctionsClick(Sender: TObject);
 var client : IInfluxClient;
     health : THealthCheck;
     ready : TReady;
@@ -78,6 +83,67 @@ begin
   end
   else
     Log('Ready error');
+
+end;
+
+
+procedure TForm1.btnWriteExampleClick(Sender: TObject);
+var p : IInfluxPoint;
+    client : IInfluxClient;
+    writeAPI : IWriteAPI;
+    val1 : double;
+    val2 : int64;
+    i:integer;
+    starttime : TStopwatch;
+    point1,point2 : IInfluxPoint;
+    error : TError;
+    procedure Log(text : string ); overload;
+    begin
+      memo1.Lines.Add(text);
+    end;
+begin
+  starttime := TStopWatch.StartNew;
+  randomize;
+  //
+  client := TInfluxDBV2.NewClient(edtServerURL.Text, edtToken.Text);
+  writeAPI := client.WriteAPIBlocking('org1','buck1');
+  // setup default tags for all writes through this API
+  writeApi.AddDefaultTags('location','hostname');
+  // write point with the current (client-side) timestamp
+  point1 := newPoint('temperature',
+                      [TPair<string,string>.Create('example','exp')],
+                      [TPair<string,TValue>.Create('value',20 + round(100 * random(1000) / 10) )],
+                      now()
+                      );
+
+
+  error := writeApi.writePoint(point1);
+  if error.Err then
+  begin
+    Log('Write Error '+IntToStr(error.StatusCode ) + ' ' + error.Code  +' ' + error.Message);
+  end
+  else
+    Log('Write Ok');
+  point1:= nil;
+
+  point2 := NewPointWithMeasurement('temperature')
+  .AddTag('example', 'exp')
+  .AddField('value', 10 + round(100 * random(1000) / 10))
+  .SetTime(Now()); // can be also a number, but in writeApi's precision units (s, ms, us, ns)!
+  error := writeApi.writePoint(point2);
+  if error.Err then
+  begin
+    Log('Write Error '+IntToStr(error.StatusCode ) + ' '  + error.Code  +' ' + error.Message);
+  end
+  else
+    Log('Write Ok');
+  point2:= nil;
+
+  starttime.Stop;
+  writeAPI := nil;
+  client := nil;
+  ShowMessage('Done in '+starttime.Elapsed);
+
 
 end;
 
