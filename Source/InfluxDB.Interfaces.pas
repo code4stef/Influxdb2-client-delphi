@@ -6,6 +6,22 @@ uses InfluxDB.Types;
 
 type
 
+  IWriteAPI  =  interface
+  ['{2FB03DB6-3F71-4DB5-8045-EB6DAC62D743}']
+    // WriteRecord writes asynchronously line protocol record into bucket.
+    // WriteRecord adds record into the buffer which is sent on the background when it reaches the batch size.
+    // Blocking alternative is available in the WriteAPIBlocking interface
+    function WriteRecord(line : string) : TError;
+    // WritePoint writes asynchronously Point into bucket.
+    // WritePoint adds Point into the buffer which is sent on the background when it reaches the batch size.
+    // Blocking alternative is available in the WriteAPIBlocking interface
+    function WritePoint(point : IInfluxPoint) : TError;
+
+    procedure AddDefaultTags(Key, Value : string);
+
+  end;
+
+
   IInfluxClient = interface
     ['{350E4CAA-913A-4266-9C56-D45169117703}']
     // Setup sends request to initialise new InfluxDB server with user, org and bucket, and data retention period
@@ -34,10 +50,10 @@ type
     //HTTPService() http.Service
     // WriteAPI returns the asynchronous, non-blocking, Write client.
     // Ensures using a single WriteAPI instance for each org/bucket pair.
-    //function WriteAPI(org, bucket string) api.WriteAPI
+    //function WriteAPI(org, bucket : string) : IWriteAPI;
     // WriteAPIBlocking returns the synchronous, blocking, Write client.
     // Ensures using a single WriteAPIBlocking instance for each org/bucket pair.
-    //WriteAPIBlocking(org, bucket string) api.WriteAPIBlocking
+    function WriteAPIBlocking(org, bucket : string) : IWriteAPI;
     // QueryAPI returns Query client.
     // Ensures using a single QueryAPI instance each org.
     //function QueryAPI(org string) api.QueryAPI
